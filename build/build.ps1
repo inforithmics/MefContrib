@@ -2,9 +2,8 @@ properties {
     $base_directory   = resolve-path "..\."
     $build_directory  = "$base_directory\release"
     $source_directory = "$base_directory\src"
-    $nuget_directory  = "$base_directory\nuget"
     $tools_directory  = "$base_directory\tools"
-    $version          = "1.1.0.0"
+    $version          = "1.2.1.0"
 }
 
 include .\psake_ext.ps1
@@ -23,15 +22,15 @@ task Init -description "This tasks makes sure the build environment is correctly
 		-company "MefContrib" `
 		-product "MefContrib $version" `
 		-version $version `
-		-copyright "Copyright © MefContrib 2009 - 2011" `
+		-copyright "Copyright © MefContrib 2009 - 2012" `
 		-clsCompliant "false"
         
-    if ((Test-Path $build_directory) -eq $false) {
+    if ((Test-Path $build_directory) -eq $false -or (Test-Path $build_directory\\$solution) -eq $false) {
         New-Item $build_directory\\$solution -ItemType Directory
     }
 }
 
-task Test -depends Compile -description "This task executes all tests" {
+task Test -depends CopyArtifacts -description "This task executes all tests" {
     $previous_directory = pwd
     cd $build_directory\\$solution
 
@@ -47,10 +46,13 @@ task Test -depends Compile -description "This task executes all tests" {
     cd $previous_directory 
 }
 
+task CopyArtifacts -depends Compile -description "This task copies all artifacts" {
+    Get-ChildItem $source_directory -recurse -Include *.dll,*.pdb,*.config | where {$_ -notmatch 'packages' -and $_ -notmatch 'Debug'} | copy -destination $build_directory\\$solution
+}
+
 task Compile -depends Clean, Init -description "This task compiles the solution" {
     exec { 
         msbuild $source_directory\$solution.sln `
-            /p:outdir=$build_directory\\$solution\\ `
             /verbosity:quiet `
             /p:Configuration=Release `
 			/property:WarningLevel=3
@@ -58,47 +60,5 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 }
 
 task NuGet -depends Test -description "This task creates the NuGet packages" {
-	Create-NuGet-Package `
-		-version $version `
-		-specfile "$nuget_directory\MefContrib\MefContrib.nuspec" `
-		-sourceselection "$base_directory\release\MefContrib\MefContrib.[dp][ld][lb]" `
-		-librariesroot "$nuget_directory\MefContrib\lib" `
-		-nugetcommand "$tools_directory\nuget\NuGet.exe"
-		
-	Create-NuGet-Package `
-		-version $version `
-		-specfile "$nuget_directory\MefContrib.Interception.Castle\MefContrib.Interception.Castle.nuspec" `
-		-sourceselection "$base_directory\release\MefContrib\MefContrib.Hosting.Interception.Castle.[dp][ld][lb]" `
-		-librariesroot "$nuget_directory\MefContrib.Interception.Castle\lib" `
-		-nugetcommand "$tools_directory\nuget\NuGet.exe"
-        
-	Create-NuGet-Package `
-		-version $version `
-		-specfile "$nuget_directory\MefContrib.Interception.LinFu\MefContrib.Interception.LinFu.nuspec" `
-		-sourceselection "$base_directory\release\MefContrib\MefContrib.Hosting.Interception.LinFu.[dp][ld][lb]" `
-		-librariesroot "$nuget_directory\MefContrib.Interception.LinFu\lib" `
-		-nugetcommand "$tools_directory\nuget\NuGet.exe"
-		
-	Create-NuGet-Package `
-		-version $version `
-		-specfile "$nuget_directory\MefContrib.Integration.Unity\MefContrib.Integration.Unity.nuspec" `
-		-sourceselection "$base_directory\release\MefContrib\MefContrib.Integration.Unity.[dp][ld][lb]" `
-		-librariesroot "$nuget_directory\MefContrib.Integration.Unity\lib" `
-		-nugetcommand "$tools_directory\nuget\NuGet.exe"
-        
-	Create-NuGet-Package `
-		-version $version `
-		-specfile "$nuget_directory\MefContrib.Integration.Autofac\MefContrib.Integration.Autofac.nuspec" `
-		-sourceselection "$base_directory\release\MefContrib\MefContrib.Integration.Autofac.[dp][ld][lb]" `
-		-librariesroot "$nuget_directory\MefContrib.Integration.Autofac\lib" `
-		-nugetcommand "$tools_directory\nuget\NuGet.exe"
-		
-	Create-NuGet-Package `
-		-version $version `
-		-specfile "$nuget_directory\MefContrib.MVC3\MefContrib.MVC3.nuspec" `
-		-sourceselection "$base_directory\release\MefContrib\MefContrib.Web.Mvc.[dp][ld][lb]" `
-		-librariesroot "$nuget_directory\MefContrib.MVC3\lib" `
-		-nugetcommand "$tools_directory\nuget\NuGet.exe"
-
-    Move-Item *.nupkg $base_directory\release
+    Get-ChildItem $source_directory -recurse -Include *.nupkg | where {$_ -notmatch 'packages' -and $_ -notmatch 'Debug'} | copy -destination $build_directory
 }

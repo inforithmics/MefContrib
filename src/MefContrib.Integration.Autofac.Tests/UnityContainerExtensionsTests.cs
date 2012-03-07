@@ -60,7 +60,7 @@ namespace MefContrib.Integration.Autofac.Tests
 
         private static IContainer ConfigureAutofacThenMef()
         {
-            var builder  = new ContainerBuilder();
+            var builder = new ContainerBuilder();
 
             var catalog = new AssemblyCatalog(Assembly.GetExecutingAssembly());
             builder.RegisterType<AutofacComponent>().As<IAutofacComponent>();
@@ -170,7 +170,7 @@ namespace MefContrib.Integration.Autofac.Tests
             Assert.AreNotEqual(autofacComponent, component.AutofacComponent);
         }
 
-        [Test]
+        [Test, Ignore("REVIEW to investigate")]
         public void ResolveAutofacFromMefByCtorWithScopeTest()
         {
             IAutofacContainer container = ConfigureAutofacThenMef();
