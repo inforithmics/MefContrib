@@ -47,6 +47,7 @@
 
     <Target Name="BuildPackage" DependsOnTargets="CheckPrerequisites">
         <Exec Command="$(BuildCommand)"
-              LogStandardErrorAsError="true" />
+              LogStandardErrorAsError="true"
+              Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' "  />
     </Target>
 </Project>

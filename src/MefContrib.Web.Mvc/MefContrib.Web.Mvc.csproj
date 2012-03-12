@@ -94,6 +94,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App_Start\AppStart_MefContribMVC3.cs.pp" />
     <None Include="MefContrib.MVC3.nuspec" />
     <None Include="MefContrib.snk" />
     <None Include="packages.config" />
