@@ -3,7 +3,7 @@ properties {
     $build_directory  = "$base_directory\release"
     $source_directory = "$base_directory\src"
     $tools_directory  = "$base_directory\tools"
-    $version          = "1.2.1.0"
+    $version          = "1.2.1.1"
 }
 
 include .\psake_ext.ps1

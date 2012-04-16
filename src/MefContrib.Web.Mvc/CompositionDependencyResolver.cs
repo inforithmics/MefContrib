@@ -1,4 +1,8 @@
-﻿namespace MefContrib.Web.Mvc
+﻿using System.Globalization;
+using System.IO;
+using System.Reflection;
+
+namespace MefContrib.Web.Mvc
 {
     using System;
     using System.Collections.Generic;
@@ -75,16 +79,60 @@
         }
 
         /// <summary>
+        /// Handles composition exceptions and returns true if handled, false if the exception should be thrown. Can be overriden.
+        /// </summary>
+        /// <param name="exception">The exception to handle.</param>
+        /// <returns>True if the exception has been handled, false if otherwise.</returns>
+        public virtual bool HandleException(Exception exception)
+        {
+            var fileNotFoundException = exception as FileNotFoundException;
+            if (fileNotFoundException != null)
+            {
+                var exceptionMessage = string.Format(CultureInfo.InvariantCulture,
+                                                     "An error occurred while composing the MEF parts. Reason: {0}",
+                                                     fileNotFoundException.FusionLog);
+                throw new InvalidOperationException(exceptionMessage, fileNotFoundException);
+            }
+
+            var reflectionTypeLoadException = exception as ReflectionTypeLoadException;
+            if (reflectionTypeLoadException != null)
+            {
+                var loaderExceptionMessages = reflectionTypeLoadException.LoaderExceptions.Select(loaderException => loaderException.Message).ToList();
+
+                var loadedTypeNames = reflectionTypeLoadException.Types.Select(type => type != null ? type.FullName : null).ToList();
+
+                var exceptionMessage = string.Format(CultureInfo.InvariantCulture,
+                                                     "An error occurred while composing the MEF parts. Type(s): {0} , Reason(s): {1}",
+                                                     string.Join(", ", loadedTypeNames),
+                                                     string.Join(Environment.NewLine + "Next reason: ", loaderExceptionMessages));
+
+                throw new InvalidOperationException(exceptionMessage, reflectionTypeLoadException);
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Resolves singly registered services that support arbitrary object creation.
         /// </summary>
         /// <param name="serviceType">The type of the requested service or object.</param>
         /// <returns>The requested service or object.</returns>
         public object GetService(Type serviceType)
         {
-            var exports = this.Container.GetExports(serviceType, null, null);
-            if (exports.Any())
+            try
             {
-                return exports.First().Value;
+                var exports = this.Container.GetExports(serviceType, null, null);
+                if (exports.Any())
+                {
+                    return exports.First().Value;
+                }
+            }
+            catch (Exception e)
+            {
+                if (!HandleException(e))
+                {
+                    throw;
+                }
             }
             return null;
         }
@@ -96,10 +144,20 @@
         /// <returns>The requested services.</returns>
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            var exports = this.Container.GetExports(serviceType, null, null);
-            if (exports.Any())
+            try
             {
-                return exports.Select(e => e.Value).AsEnumerable();
+                var exports = this.Container.GetExports(serviceType, null, null);
+                if (exports.Any())
+                {
+                    return exports.Select(e => e.Value).AsEnumerable();
+                }
+            }
+            catch (Exception e)
+            {
+                if (!HandleException(e))
+                {
+                    throw;
+                }
             }
             return new List<object>();
         }
@@ -112,7 +170,17 @@
         /// <returns></returns>
         public T Build<T>(T service)
         {
-            this.Container.SatisfyImportsOnce(service);
+            try
+            {
+                this.Container.SatisfyImportsOnce(service);
+            }
+            catch (Exception e)
+            {
+                if (!HandleException(e))
+                {
+                    throw;
+                }
+            }
             return service;
         }
     }
