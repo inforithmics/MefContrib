@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>MefContrib</id>
-    <version>1.2.2.0</version>
+    <version>1.2.2.1</version>
     <authors>MefContrib</authors>
     <owners>MefContrib</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,4 +16,10 @@
       <frameworkAssembly assemblyName="System.ComponentModel.Composition" />
     </frameworkAssemblies>
   </metadata>
+  <files>
+    <file src="bin\Release\MefContrib.dll" target="lib\net40-Client" />
+    <file src="bin\Release\MefContrib.pdb" target="lib\net40-Client" />
+    <file src="bin\Release\MefContrib.Silverlight.dll" target="lib\sl" />
+    <file src="bin\Release\MefContrib.Silverlight.pdb" target="lib\sl" />
+  </files>
 </package>

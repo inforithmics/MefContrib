@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>MefContrib.MVC3</id>
-    <version>1.2.2.0</version>
+    <version>1.2.2.1</version>
     <authors>Maarten Balliauw</authors>
     <owners>MefContrib</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -21,7 +21,7 @@
   </metadata>
   <files>
     <file src="App_Start\*.*" target="content\App_Start" />
-    <file src="bin\Release\*.dll" target="lib" />
-    <file src="bin\Release\*.pdb" target="lib" />
+    <file src="bin\Release\*Mvc.dll" target="lib" />
+    <file src="bin\Release\*Mvc.pdb" target="lib" />
   </files>
 </package>
