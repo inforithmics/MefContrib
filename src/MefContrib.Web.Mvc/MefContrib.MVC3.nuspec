@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>MefContrib.MVC3</id>
-    <version>1.2.1.2</version>
+    <version>1.2.2.0</version>
     <authors>Maarten Balliauw</authors>
     <owners>MefContrib</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,7 +16,7 @@
       <dependency id="MefContrib" version="1.2" />
     </dependencies>
     <frameworkAssemblies>
-      <frameworkAssembly assemblyName="System.ComponentModel.Composition" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System.ComponentModel.Composition" />
     </frameworkAssemblies>
   </metadata>
   <files>
