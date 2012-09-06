@@ -33,8 +33,18 @@ namespace MefContrib.Web.Mvc
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositionDependencyResolver"/> class.
         /// </summary>
-        /// <param name="catalog">The catalog.</param>
+        /// <param name="catalog">The catalog.</param>        
         public CompositionDependencyResolver(ComposablePartCatalog catalog)
+            : this(catalog, null)
+        {            
+        }       
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompositionDependencyResolver"/> class.
+        /// </summary>
+        /// <param name="catalog">The catalog.</param>
+        /// <param name="providers">An array of <see cref="T:System.ComponentModel.Composition.Hosting.ExportProvider"/> objects that provide the <see cref="T:System.ComponentModel.Composition.Hosting.CompositionContainer"/> access to <see cref="T:System.ComponentModel.Composition.Primitives.Export"/> objects, or null to set the <see cref="P:System.ComponentModel.Composition.Hosting.CompositionContainer.Providers"/> property to an empty <see cref="T:System.Collections.ObjectModel.ReadOnlyCollection`1"/>.</param>
+        public CompositionDependencyResolver(ComposablePartCatalog catalog, params ExportProvider[] providers)            
         {
             // Keep the original catalog
             this.completeCatalog = catalog;
@@ -42,12 +52,12 @@ namespace MefContrib.Web.Mvc
             // Filter the global part catalog to a set of parts that define PartCreationScope.Global.
             this.globalCatalog = new FilteringCatalog(
                 this.completeCatalog, new HasPartCreationScope(PartCreationScope.Global));
-            this.globalContainer = new CompositionContainer(this.globalCatalog, true, null);
+            this.globalContainer = new CompositionContainer(this.globalCatalog, true, providers);
 
             // Filter the per-request part catalog to a set of parts that define PartCreationScope.PerRequest.
             this.filteredCatalog = new FilteringCatalog(
                 this.completeCatalog, new HasPartCreationScope(PartCreationScope.PerRequest));
-        }
+        }       
 
         /// <summary>
         /// Gets the global container.
